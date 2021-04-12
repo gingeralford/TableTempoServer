@@ -118,15 +118,29 @@ router.get('/today/', validateSessionStaff, function(req,res){
 })
 
 //GET TODAY'S PARTIES (ONE restaurant but all staff)
-//TODO: Add better time handling so it returns parties from 5am on, not exactly 24hrs
+//TODO: See how this date/time handling is working out
 router.get('/todayall', validateSessionStaff, function(req,res){
     let restaurantId = req.staff.restaurantId;
+    //Function to set time to 5am either today or day before
+    let time = new Date();
+    console.log(time);
+    if (time.getHours() >= 5) {
+        time.setHours(5,0,1)
+        console.log(time)
+        //right now uses UTC which is 4 hours ahead
+    } else {
+        time.setHours(5,0,1);
+        time.setDate(time.getDate() - 1);
+        console.log(time)
+    };
+
     Party.findAll({
         where: {
             [Op.and]: [
             {restaurantId: restaurantId},
-            {timeArrived: { [Op.gt]: new Date(new Date().setDate(new Date().getDate() - 1))}}
-            //timeArrived greater than now minus 1 day
+            {timeArrived: { [Op.gt]: time}}
+            //Seems to work but who knows with timezone shifting
+            //new Date(new Date().setDate(new Date().getDate() - 1))
             ]}
     })
         .then((parties) => res.status(200).json(parties))

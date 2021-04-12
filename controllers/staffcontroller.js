@@ -14,7 +14,7 @@ router.post('/create/:inviteCode', function (req, res) {
     Staff.create({
         inviteCode: req.params.inviteCode,
         restaurantId: req.body.staff.restaurantId,
-        //TODO: do i need restaurantID if I have inviteCode?
+        //TODO: do i need restaurantID if I have inviteCode? Probably need to look up restaurantId by inviteCode
         email: req.body.staff.email,
         password: bcrypt.hashSync(req.body.staff.password, 17),
         active: false,
@@ -92,7 +92,6 @@ router.get('/', validateSessionRest, function(req,res){
 })
 
 //UPDATE STAFF MEMBER INFO
-//TODO: doesn't work right now because restaurantId not added to staff table
 router.put('/update/:staffId', validateSessionRest, function (req, res){
     const updateStaff = {
         // email: req.body.staff.email, <-might not need this, thinking of a use case
@@ -104,7 +103,7 @@ router.put('/update/:staffId', validateSessionRest, function (req, res){
     const query = { 
         where: {
             [Op.and]: [
-                {staffId: req.params.staffId},
+                {id: req.params.staffId},
                 {restaurantId: req.restaurant.id}
             ]
         }
@@ -124,13 +123,12 @@ router.put('/update/:staffId', validateSessionRest, function (req, res){
 // }
 
 //DELETE A STAFF MEMBER
-//TODO: won't work until restaurantId is added to staff table
 router.delete('/delete/:staffId', validateSessionRest, function(req, res) {
     // const query = {where: {id: req.params.staffId, restaurantId: req.body.staff.restaurantId}};
     const query = { 
         where: {
             [Op.and]: [
-                {staffId: req.params.staffId},
+                {id: req.params.staffId},
                 {restaurantId: req.restaurant.id}
             ]
         }
