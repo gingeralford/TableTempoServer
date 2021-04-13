@@ -16,7 +16,7 @@ router.post('/create', function (req, res) {
         restaurantName:req.body.restaurant.restaurantName,
         email: req.body.restaurant.email,
         password: bcrypt.hashSync(req.body.restaurant.password, 17),
-        inviteCode: uuidv4()
+        uniqueCode : uuidv4()
         //auto-generates a random code on creation, not needed in request from client side
     })
     .then(
@@ -51,7 +51,7 @@ router.post('/login', function (req, res) {
             if(restaurant){
                 bcrypt.compare(req.body.restaurant.password, restaurant.password, function(err, matches){
                     if(matches){
-                        let token = jwt.sign({id: restaurant.id, inviteCode: restaurant.inviteCode}, process.env.JWT_SECRET, {expiresIn: 60*60*24})
+                        let token = jwt.sign({id: restaurant.id, uniqueCode: restaurant.uniqueCode}, process.env.JWT_SECRET, {expiresIn: 60*60*24})
                         
                         res.status(200).json({
                             restaurant: restaurant,

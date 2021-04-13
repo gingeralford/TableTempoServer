@@ -9,10 +9,10 @@ let party = require('./controllers/partycontroller');
 
 sequelize.sync();
 // sequelize.sync({ force: true })  
-
+ 
 app.use(express.json());
 
-app.use('/test', function(req, res){
+app.use('/test', function(req, res){ 
     res.send('This is a message from the Table Tempo test server!')
 })
 

@@ -24,7 +24,8 @@ router.post('/create', validateSessionStaff, function (req, res) {
         specialNotes: req.body.party.specialNotes,
         //changed staffId and restaurantId to both come from the token
         staffId: req.staff.id,
-        restaurantId: req.staff.restaurantId
+        restaurantId: req.staff.restaurantId,
+        uniqueCode: req.staff.uniqueCode
     })
     .then(
         function successfulCreation(party) {
@@ -70,7 +71,8 @@ router.put('/update/:partyId', validateSessionStaff, function (req, res){
         specialNotes: req.body.party.specialNotes,
         //Changed staffId and restaurantId to come from the token
         staffId: req.staff.id,
-        restaurantId: req.staff.restaurantId
+        restaurantId: req.staff.restaurantId,
+        uniqueCode: req.staff.uniqueCode
     };
 
     const query = {where: {id: req.params.partyId}};
@@ -103,12 +105,12 @@ router.put('/update/:partyId', validateSessionStaff, function (req, res){
 router.get('/today/', validateSessionStaff, function(req,res){
     // let staffId = req.staff.id < will need this back in when Validate Session
     let staffId = req.staff.id;
-    let restaurantId = req.staff.restaurantId;
+    let restaurantCode = req.staff.uniqueCode;
     Party.findAll({
         where: {
             [Op.and]: [
             {staffId: staffId},
-            {restaurantId: restaurantId},
+            {uniqueCode: restaurantCode},
             {timeArrived: { [Op.gt]: new Date(new Date().setDate(new Date().getDate() - 1))}}
             //timeArrived greater than now minus 1 day
             ]}
@@ -120,7 +122,7 @@ router.get('/today/', validateSessionStaff, function(req,res){
 //GET TODAY'S PARTIES (ONE restaurant but all staff)
 //TODO: See how this date/time handling is working out
 router.get('/todayall', validateSessionStaff, function(req,res){
-    let restaurantId = req.staff.restaurantId;
+    let restaurantCode = req.staff.uniqueCode;
     //Function to set time to 5am either today or day before
     let time = new Date();
     console.log(time);
@@ -137,7 +139,7 @@ router.get('/todayall', validateSessionStaff, function(req,res){
     Party.findAll({
         where: {
             [Op.and]: [
-            {restaurantId: restaurantId},
+            {uniqueCode: restaurantCode},
             {timeArrived: { [Op.gt]: time}}
             //Seems to work but who knows with timezone shifting
             //new Date(new Date().setDate(new Date().getDate() - 1))
@@ -156,7 +158,7 @@ router.get('/daterange', validateSessionRest, function(req,res){
             [Op.and]: [
             {restaurantId: restaurantId},
             {timeArrived: { [Op.lt]: new Date()}}
-        //returns everything before this moment, for now...
+        //returns everything before this moment, for now. Will edit once litePicker is setup
             ]}
     })
         .then((allParties) => res.status(200).json(allParties))
@@ -167,10 +169,10 @@ router.get('/daterange', validateSessionRest, function(req,res){
 //DELETE PARTY
 router.delete('/delete/:partyId', validateSessionStaff, function(req, res) {
     let staffId = req.staff.id;
-    let restaurantId = req.staff.restaurantId;
+    let restaurantCode = req.staff.uniqueCode;
     const query = {where: {
         [Op.and]: [
-        {restaurantId: restaurantId},
+        {uniqueCode: restaurantCode},
         {staffId: staffId},
         {id: req.params.partyId}
         ]}
