@@ -40,12 +40,16 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.STRING,
             allowNull: true
         },
-        staffId: {
+        // staffId: {
+        //     type: DataTypes.INTEGER,
+        //     allowNull: false
+        // },
+        restaurantId: {
             type: DataTypes.INTEGER,
             allowNull: false
         },
-        restaurantId: {
-            type: DataTypes.INTEGER,
+        uniqueCode: {
+            type: DataTypes.STRING,
             allowNull: false
         }
     });

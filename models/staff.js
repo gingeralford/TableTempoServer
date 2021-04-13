@@ -1,13 +1,13 @@
 module.exports = function (sequelize, DataTypes) {
     const Staff = sequelize.define("staff", {
-        inviteCode: {
+        uniqueCode: {
             type: DataTypes.STRING,
             allowNull: false
         },
-        restaurantId: {
-            type: DataTypes.INTEGER,
-            allowNull: false
-        },
+        // restaurantId: {
+        //     type: DataTypes.INTEGER,
+        //     allowNull: false
+        // },
         email:{
             type: DataTypes.STRING,
             allowNull: false,

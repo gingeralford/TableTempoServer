@@ -14,12 +14,12 @@ sequelize.authenticate().then(
     }
 );
 
-Party = sequelize.import('./models/party.js');
-Staff = sequelize.import('./models/staff.js');
-Restaurant = sequelize.import('./models/restaurant.js');
+const Party = sequelize.import('./models/party');
+const Staff = sequelize.import('./models/staff');
+const Restaurant = sequelize.import('./models/restaurant');
 
-
-Staff.belongsTo(Restaurant, {foreignKey: "restaurantId", targetKey: "id"});
+//{foreignKey: "uniqueCode", targetKey: "uniqueCode"}
+Staff.belongsTo(Restaurant);
 Restaurant.hasMany(Staff);
 
 Party.belongsTo(Staff);

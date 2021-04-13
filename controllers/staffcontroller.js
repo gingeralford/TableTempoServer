@@ -10,11 +10,11 @@ router.get('/practice', function(req, res){
 })
 
 //CREATE STAFF - restaurant/create
-router.post('/create/:inviteCode', function (req, res) {
+router.post('/create/:uniqueCode', function (req, res) {
     Staff.create({
-        inviteCode: req.params.inviteCode,
+        uniqueCode : req.params.uniqueCode,
         restaurantId: req.body.staff.restaurantId,
-        //TODO: do i need restaurantID if I have inviteCode? Probably need to look up restaurantId by inviteCode
+        //TODO: do i need restaurantID if I have uniqueCode? Probably need to look up restaurantId by uniqueCode
         email: req.body.staff.email,
         password: bcrypt.hashSync(req.body.staff.password, 17),
         active: false,
@@ -23,7 +23,7 @@ router.post('/create/:inviteCode', function (req, res) {
     })
     .then(
         function successfulCreation(staff) {
-            let token = jwt.sign({id: staff.id, inviteCode: staff.inviteCode, restaurantId: staff.restaurantId}, process.env.JWT_SECRET, {expiresIn: 60*60*24})
+            let token = jwt.sign({id: staff.id, uniqueCode: staff.uniqueCode, restaurantId: staff.restaurantId}, process.env.JWT_SECRET, {expiresIn: 60*60*24})
             
             res.status(200).json({
                 staff: staff,
@@ -52,7 +52,7 @@ router.post('/login', function (req, res) {
             if(staff){
                 bcrypt.compare(req.body.staff.password, staff.password, function(err, matches){
                     if(matches){
-                        let token = jwt.sign({id: staff.id, inviteCode: staff.inviteCode, restaurantId: staff.restaurantId}, process.env.JWT_SECRET, {expiresIn: 60*60*24})
+                        let token = jwt.sign({id: staff.id, uniqueCode: staff.uniqueCode, restaurantId: staff.restaurantId}, process.env.JWT_SECRET, {expiresIn: 60*60*24})
                         
                         res.status(200).json({
                             staff: staff,
@@ -80,10 +80,10 @@ router.post('/login', function (req, res) {
 
 //GET ALL STAFF (for given restaurant- Admin restaurant account only)
 router.get('/', validateSessionRest, function(req,res){
-    let restaurantId = req.restaurant.id 
+    let restaurantCode = req.restaurant.uniqueCode
     // let restaurantId = req.body.staff.restaurantId;
     Staff.findAll({
-        where: {restaurantId: restaurantId}
+        where: {uniqueCode: restaurantCode}
         // , include: 'parties' DOESN"T WORK AHHH!!!
     } 
 )
@@ -104,7 +104,7 @@ router.put('/update/:staffId', validateSessionRest, function (req, res){
         where: {
             [Op.and]: [
                 {id: req.params.staffId},
-                {restaurantId: req.restaurant.id}
+                {uniqueCode: req.restaurant.uniqueCode}
             ]
         }
     };
@@ -129,7 +129,7 @@ router.delete('/delete/:staffId', validateSessionRest, function(req, res) {
         where: {
             [Op.and]: [
                 {id: req.params.staffId},
-                {restaurantId: req.restaurant.id}
+                {uniqueCode: req.restaurant.uniqueCode}
             ]
         }
     };
