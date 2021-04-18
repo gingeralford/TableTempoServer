@@ -21,7 +21,7 @@ router.post('/create', function (req, res) {
     })
     .then(
         function successfulCreation(restaurant) {
-            let token = jwt.sign({id: restaurant.id}, process.env.JWT_SECRET, {expiresIn: 60*60*24})
+            let token = jwt.sign({id: restaurant.id, uniqueCode: restaurant.uniqueCode}, process.env.JWT_SECRET, {expiresIn: 60*60*24})
             
             res.status(200).json({
                 restaurant: restaurant,
