@@ -9,7 +9,7 @@ router.get('/practice', function(req, res){
     res.send('Hey This is a practice route for staff');
 })
 
-//CREATE STAFF - restaurant/create
+//CREATE STAFF - staff/create
 router.post('/create/:uniqueCode', function (req, res) {
     Staff.create({
         uniqueCode : req.params.uniqueCode,
@@ -17,8 +17,8 @@ router.post('/create/:uniqueCode', function (req, res) {
         //TODO: do i need restaurantID if I have uniqueCode? Probably need to look up restaurantId by uniqueCode
         email: req.body.staff.email,
         password: bcrypt.hashSync(req.body.staff.password, 17),
-        active: false,
-        admin: false
+        active: req.body.staff.active,
+        admin: req.body.staff.admin
         //want both active and admin set to false always as a starting point
     })
     .then(
