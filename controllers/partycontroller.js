@@ -17,7 +17,7 @@ router.post('/create', validateSessionStaff, function (req, res) {
         over21: req.body.party.over21,
         timeArrived: new Date(),
         timeEstimated: req.body.party.timeEstimated,
-        timeSeated: req.body.party.timeSeated,
+        timeSeated: req.body.party.timeSeated, 
         //TODO: change timeSeated to empty on create?
         //parties should always started with seated/leftUnseated false
         seated: false,
