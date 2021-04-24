@@ -15,9 +15,9 @@ router.post('/create', validateSessionStaff, function (req, res) {
         partyNum: req.body.party.partyNum,
         telephone: req.body.party.telephone,
         over21: req.body.party.over21,
-        timeArrived: req.body.party.timeArrived,
+        timeArrived: new Date(),
         timeEstimated: req.body.party.timeEstimated,
-        timeSeated: req.body.party.timeSeated,
+        timeSeated: req.body.party.timeSeated, 
         //parties should always started with seated/leftUnseated false
         seated: false,
         leftUnseated: false,
@@ -100,8 +100,6 @@ router.put('/update/:partyId', validateSessionStaff, function (req, res){
 // }
 
 //GET TODAY'S PARTIES (for ONE restaurant and ONE staff member)
-//TODO: Add in sorting by time AND by seated true/false
-//TODO: Add better time handling so it returns parties from 5am on, not exactly 24hrs
 router.get('/today/', validateSessionStaff, function(req,res){
     // let staffId = req.staff.id < will need this back in when Validate Session
     let staffId = req.staff.id;
@@ -113,7 +111,8 @@ router.get('/today/', validateSessionStaff, function(req,res){
             {uniqueCode: restaurantCode},
             {timeArrived: { [Op.gt]: new Date(new Date().setDate(new Date().getDate() - 1))}}
             //timeArrived greater than now minus 1 day
-            ]}
+            ]},
+        order: [ [ 'leftUnseated', 'ASC' ], [  'seated', 'ASC'  ], [ 'timeEstimated', 'ASC' ] ]
     })
         .then((parties) => res.status(200).json(parties))
         .catch((err) => res.status(500).json({error:err}))
