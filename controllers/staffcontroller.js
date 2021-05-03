@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require('bcryptjs');
 const { Op } = require("sequelize");
 const validateSessionRest = require('../middleware/validateSessionRest');
+const validateSessionStaff = require('../middleware/validateSessionStaff');
 
 router.get('/practice', function(req, res){
     res.send('Hey This is a practice route for staff');
@@ -23,7 +24,7 @@ router.post('/create/:uniqueCode', function (req, res) {
     })
     .then(
         function successfulCreation(staff) {
-            let token = jwt.sign({id: staff.id, uniqueCode: staff.uniqueCode, restaurantId: staff.restaurantId}, process.env.JWT_SECRET, {expiresIn: 60*60*24})
+            let token = jwt.sign({id: staff.id, uniqueCode: staff.uniqueCode, restaurantId: staff.restaurantId, admin: staff.admin}, process.env.JWT_SECRET, {expiresIn: 60*60*24})
             
             res.status(200).json({
                 staff: staff,
@@ -52,7 +53,7 @@ router.post('/login', function (req, res) {
             if(staff){
                 bcrypt.compare(req.body.staff.password, staff.password, function(err, matches){
                     if(matches){
-                        let token = jwt.sign({id: staff.id, uniqueCode: staff.uniqueCode, restaurantId: staff.restaurantId}, process.env.JWT_SECRET, {expiresIn: 60*60*24})
+                        let token = jwt.sign({id: staff.id, uniqueCode: staff.uniqueCode, restaurantId: staff.restaurantId, admin: staff.admin}, process.env.JWT_SECRET, {expiresIn: 60*60*24})
                         
                         res.status(200).json({
                             staff: staff,
@@ -79,8 +80,8 @@ router.post('/login', function (req, res) {
 //No restaurant name or anything else needed
 
 //GET ALL STAFF (for given restaurant- Admin restaurant account only)
-router.get('/', validateSessionRest, function(req,res){
-    let restaurantCode = req.restaurant.uniqueCode
+router.get('/', validateSessionStaff, function(req,res){
+    let restaurantCode = req.staff.uniqueCode
     // let restaurantId = req.body.staff.restaurantId;
     Staff.findAll({
         where: {uniqueCode: restaurantCode}
