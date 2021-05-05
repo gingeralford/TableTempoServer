@@ -93,19 +93,23 @@ router.get('/', validateSessionStaff, function(req,res){
 })
 
 //UPDATE STAFF MEMBER INFO
-router.put('/update/:staffId', validateSessionRest, function (req, res){
+router.put('/update/:staffId', validateSessionStaff, function (req, res){
+    if(req.staff.admin !== true){
+        return;
+    }
+
     const updateStaff = {
         // email: req.body.staff.email, <-might not need this, thinking of a use case
         password: bcrypt.hashSync(req.body.staff.password, 17),
-        active: req.body.staff.active
-        //admin: false Maybe don't need this database line, unless need to switch off and on
+        active: req.body.staff.active,
+        admin: req.body.staff.admin 
     };
 
     const query = { 
         where: {
             [Op.and]: [
                 {id: req.params.staffId},
-                {uniqueCode: req.restaurant.uniqueCode}
+                {uniqueCode: req.staff.uniqueCode}
             ]
         }
     };
@@ -124,13 +128,13 @@ router.put('/update/:staffId', validateSessionRest, function (req, res){
 // }
 
 //DELETE A STAFF MEMBER
-router.delete('/delete/:staffId', validateSessionRest, function(req, res) {
+router.delete('/delete/:staffId', validateSessionStaff, function(req, res) {
     // const query = {where: {id: req.params.staffId, restaurantId: req.body.staff.restaurantId}};
     const query = { 
         where: {
             [Op.and]: [
                 {id: req.params.staffId},
-                {uniqueCode: req.restaurant.uniqueCode}
+                {uniqueCode: req.staff.uniqueCode}
             ]
         }
     };
