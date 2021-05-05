@@ -100,8 +100,20 @@ router.put('/update/:partyId', validateSessionStaff, function (req, res){
 // }
 
 //GET TODAY'S PARTIES (for ONE restaurant and ONE staff member)
+//Right now just gets exactly 24 hours back
 router.get('/today/', validateSessionStaff, function(req,res){
     // let staffId = req.staff.id < will need this back in when Validate Session
+    let time = new Date();
+    console.log(time);
+    if (time.getHours() >= 5) {
+        time.setHours(5,0,1)
+        console.log(time)
+        //right now uses UTC which is 4 hours ahead
+    } else {
+        time.setHours(5,0,1);
+        time.setDate(time.getDate() - 1);
+        console.log(time)
+    };
     let staffId = req.staff.id;
     let restaurantCode = req.staff.uniqueCode;
     Party.findAll({
@@ -109,7 +121,8 @@ router.get('/today/', validateSessionStaff, function(req,res){
             [Op.and]: [
             {staffId: staffId},
             {uniqueCode: restaurantCode},
-            {timeArrived: { [Op.gt]: new Date(new Date().setDate(new Date().getDate() - 1))}}
+            {timeArrived: { [Op.gt]: time}}
+            // new Date(new Date().setDate(new Date().getDate() - 1))
             //timeArrived greater than now minus 1 day
             ]},
         order: [ [ 'leftUnseated', 'ASC' ], [  'seated', 'ASC'  ], [ 'timeEstimated', 'ASC' ] ]
@@ -124,7 +137,7 @@ router.get('/todayall', validateSessionStaff, function(req,res){
     let restaurantCode = req.staff.uniqueCode;
     //Function to set time to 5am either today or day before
     let time = new Date();
-    console.log(time);
+    // console.log(time);
     if (time.getHours() >= 5) {
         time.setHours(5,0,1)
         console.log(time)
