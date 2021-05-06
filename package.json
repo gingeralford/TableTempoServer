@@ -2,6 +2,10 @@
   "name": "table-tempo-server",
   "version": "1.0.0",
   "description": "Waitlist Tracking App",
+  "engines": {
+    "node": "14.15.0",
+    "npm": "6.x"
+  },
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -15,10 +19,10 @@
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
-    "dotenv": "^8.0.0",
+    "dotenv": "^8.6.0",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
-    "pg": "^8.5.1",
+    "pg": "^8.6.0",
     "pg-hstore": "^2.3.3",
     "sequelize": "^5.21.1",
     "uuid": "^8.3.2"
