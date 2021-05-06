@@ -68,6 +68,14 @@ router.post('/login', function (req, res) {
         })
     .catch(err => res.status(500).json({error: err}))
 });
+
+router.get('/lookup/:uuid', function (req, res) {
+    Restaurant.findOne({where:{uniqueCode: req.params.uuid}})
+    .then((restaurant) => res.status(200).json(restaurant))
+    .catch((err) => console.log(err))
+})
+
+
 // example request:
 // {
 //     "restaurant" : {
