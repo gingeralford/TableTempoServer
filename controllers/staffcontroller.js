@@ -17,7 +17,7 @@ router.post('/create/:uniqueCode', function (req, res) {
         restaurantId: req.body.staff.restaurantId,
         //TODO: do i need restaurantID if I have uniqueCode? Probably need to look up restaurantId by uniqueCode
         email: req.body.staff.email,
-        password: bcrypt.hashSync(req.body.staff.password, 17),
+        password: bcrypt.hashSync(req.body.staff.password, 10),
         active: req.body.staff.active,
         admin: req.body.staff.admin
         //want both active and admin set to false always as a starting point
@@ -100,7 +100,7 @@ router.put('/update/:staffId', validateSessionStaff, function (req, res){
 
     const updateStaff = {
         // email: req.body.staff.email, <-might not need this, thinking of a use case
-        password: bcrypt.hashSync(req.body.staff.password, 17),
+        password: bcrypt.hashSync(req.body.staff.password, 10),
         active: req.body.staff.active,
         admin: req.body.staff.admin 
     };

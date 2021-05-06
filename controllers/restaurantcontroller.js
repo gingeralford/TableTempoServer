@@ -15,7 +15,7 @@ router.post('/create', function (req, res) {
     Restaurant.create({
         restaurantName:req.body.restaurant.restaurantName,
         email: req.body.restaurant.email,
-        password: bcrypt.hashSync(req.body.restaurant.password, 17),
+        password: bcrypt.hashSync(req.body.restaurant.password, 10),
         uniqueCode : uuidv4()
         //auto-generates a random code on creation, not needed in request from client side
     })
@@ -68,6 +68,14 @@ router.post('/login', function (req, res) {
         })
     .catch(err => res.status(500).json({error: err}))
 });
+
+router.get('/lookup/:uuid', function (req, res) {
+    Restaurant.findOne({where:{uniqueCode: req.params.uuid}})
+    .then((restaurant) => res.status(200).json(restaurant))
+    .catch((err) => console.log(err))
+})
+
+
 // example request:
 // {
 //     "restaurant" : {
