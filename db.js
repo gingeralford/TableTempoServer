@@ -1,7 +1,6 @@
 // require("dotenv").config();
 const Sequelize = require('sequelize');
-const sequelize = new Sequelize('table-tempo-server', 'postgres', 'password', {
-    host: 'localhost',
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
     dialect: 'postgres'
 });
 
