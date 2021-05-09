@@ -56,7 +56,6 @@ router.post('/create', validateSessionStaff, function (req, res) {
 
 
 //PARTY UPDATE
-//UPDATE STAFF ENTRY
 router.put('/update/:partyId', validateSessionStaff, function (req, res){
     const updateParty = {
         name:req.body.party.name,
@@ -132,7 +131,6 @@ router.get('/today/', validateSessionStaff, function(req,res){
 })
 
 //GET TODAY'S PARTIES (ONE restaurant but all staff)
-//TODO: See how this date/time handling is working out
 router.get('/todayall', validateSessionStaff, function(req,res){
     let restaurantCode = req.staff.uniqueCode;
     //Function to set time to 5am either today or day before
@@ -153,27 +151,47 @@ router.get('/todayall', validateSessionStaff, function(req,res){
             [Op.and]: [
             {uniqueCode: restaurantCode},
             {timeArrived: { [Op.gt]: time}}
-            //Seems to work but who knows with timezone shifting
-            //new Date(new Date().setDate(new Date().getDate() - 1))
             ]}
     })
         .then((parties) => res.status(200).json(parties))
         .catch((err) => res.status(500).json({error:err}))
 })
 
-//GET ALL PARTIES BY DATE RANGE (Must be logged in as Restaurant view)
-//TODO: Add in date functionality with the date selection system used
-router.get('/daterange', validateSessionRest, function(req,res){
-    let restaurantId = req.restaurant.id;
+//GET ALL PARTIES BY DATE RANGE
+router.get('/daterange/', validateSessionStaff, function(req,res){
+    let uniqueCode = req.staff.uniqueCode;
+    let endDate= req.query.endDate;
+    let startDate= req.query.startDate;
+
     Party.findAll({
         where: {
             [Op.and]: [
-            {restaurantId: restaurantId},
-            {timeArrived: { [Op.lt]: new Date()}}
-        //returns everything before this moment, for now. Will edit once litePicker is setup
-            ]}
+            {uniqueCode: uniqueCode},
+            //date range between startDate and endDate input in URL query
+            {timeArrived: { [Op.lte]: endDate}},
+            {timeArrived: { [Op.gte]: startDate}}
+            ]},
+            order: [ [ 'timeArrived', 'ASC' ] ]
     })
-        .then((allParties) => res.status(200).json(allParties))
+        .then((allParties) => {res.status(200).json(allParties); console.log(req.query.endDate)})
+        .catch((err) => res.status(500).json({error:err}))
+})
+
+//Search by name
+router.get('/byname/', validateSessionStaff, function(req,res){
+    let uniqueCode = req.staff.uniqueCode;
+    let name= req.query.name;
+    Party.findAll({
+        where: {
+            [Op.and]: [
+            {uniqueCode: uniqueCode},
+            {name: {
+                [Op.iLike]: `%${name}%`
+              }}
+            ]},
+            order: [ [ 'timeArrived', 'ASC' ] ]
+    })
+        .then((allParties) => {res.status(200).json(allParties); console.log(req.query.endDate)})
         .catch((err) => res.status(500).json({error:err}))
 })
 
