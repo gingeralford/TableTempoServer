@@ -68,14 +68,6 @@ router.post('/login', function (req, res) {
         })
     .catch(err => res.status(500).json({error: err}))
 });
-
-router.get('/lookup/:uuid', function (req, res) {
-    Restaurant.findOne({where:{uniqueCode: req.params.uuid}})
-    .then((restaurant) => res.status(200).json(restaurant))
-    .catch((err) => console.log(err))
-})
-
-
 // example request:
 // {
 //     "restaurant" : {
@@ -83,8 +75,13 @@ router.get('/lookup/:uuid', function (req, res) {
 //         "password": "painting"
 //     }
 // }
-//No restaurant name or anything else needed
-//TODO: Update - as soon as I decide what functionality that will have...update password only? or restaurant name?
+
+//SIMPLE ROUTE TO JUST GET RESTAURANT NAME FROM UUID
+router.get('/lookup/:uuid', function (req, res) {
+    Restaurant.findOne({where:{uniqueCode: req.params.uuid}})
+    .then((restaurant) => res.status(200).json(restaurant))
+    .catch((err) => console.log(err))
+})
 
 
 module.exports = router

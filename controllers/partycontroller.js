@@ -2,7 +2,7 @@ const router = require('express').Router();
 const Party = require('../db').import('../models/party');
 const { Op } = require("sequelize");
 const validateSessionStaff = require('../middleware/validateSessionStaff');
-const validateSessionRest = require('../middleware/validateSessionRest')
+
 
 router.get('/practice', function(req, res){
     res.send('Hey This is a practice route for party');
@@ -18,7 +18,7 @@ router.post('/create', validateSessionStaff, function (req, res) {
         timeArrived: new Date(),
         timeEstimated: req.body.party.timeEstimated,
         timeSeated: req.body.party.timeSeated, 
-        //parties should always started with seated/leftUnseated false
+        //parties should always started with seated/leftUnseated as false
         seated: false,
         leftUnseated: false,
         specialNotes: req.body.party.specialNotes,
@@ -29,7 +29,6 @@ router.post('/create', validateSessionStaff, function (req, res) {
     })
     .then(
         function successfulCreation(party) {
-            
             res.status(200).json({
                 party: party,
                 message: "party created successfully",
@@ -68,7 +67,7 @@ router.put('/update/:partyId', validateSessionStaff, function (req, res){
         seated: req.body.party.seated,
         leftUnseated: req.body.party.leftUnseated,
         specialNotes: req.body.party.specialNotes,
-        //Changed staffId and restaurantId to come from the token
+        //Changed staffId, restaurantID, and uniqueCode to come from the token
         staffId: req.staff.id,
         restaurantId: req.staff.restaurantId,
         uniqueCode: req.staff.uniqueCode
@@ -93,14 +92,11 @@ router.put('/update/:partyId', validateSessionStaff, function (req, res){
 //         "seated": "false",
 //         "leftUnseated": "false",
 //         "specialNotes": "wacky family",
-//         "staffId": "1",
-//         "restaurantId": "3"
 //     }
 // }
 
 //GET TODAY'S PARTIES (for ONE restaurant and ONE staff member)
-//Right now just gets exactly 24 hours back
-router.get('/today/', validateSessionStaff, function(req,res){
+router.get('/today', validateSessionStaff, function(req,res){
     // let staffId = req.staff.id < will need this back in when Validate Session
     let time = new Date();
     console.log(time);
@@ -121,7 +117,6 @@ router.get('/today/', validateSessionStaff, function(req,res){
             {staffId: staffId},
             {uniqueCode: restaurantCode},
             {timeArrived: { [Op.gt]: time}}
-            // new Date(new Date().setDate(new Date().getDate() - 1))
             //timeArrived greater than now minus 1 day
             ]},
         order: [ [ 'leftUnseated', 'ASC' ], [  'seated', 'ASC'  ], [ 'timeEstimated', 'ASC' ] ]
@@ -157,7 +152,7 @@ router.get('/todayall', validateSessionStaff, function(req,res){
         .catch((err) => res.status(500).json({error:err}))
 })
 
-//GET ALL PARTIES BY DATE RANGE
+//GET ALL PARTIES BETWEEN START DATE AND END DATE (FROM URL QUERY)
 router.get('/daterange/', validateSessionStaff, function(req,res){
     let uniqueCode = req.staff.uniqueCode;
     let endDate= req.query.endDate;
@@ -173,11 +168,11 @@ router.get('/daterange/', validateSessionStaff, function(req,res){
             ]},
             order: [ [ 'timeArrived', 'ASC' ] ]
     })
-        .then((allParties) => {res.status(200).json(allParties); console.log(req.query.endDate)})
+        .then((allParties) => res.status(200).json(allParties))
         .catch((err) => res.status(500).json({error:err}))
 })
 
-//Search by name
+//SEARCH BY NAME FIELD (FROM URL QUERY)
 router.get('/byname/', validateSessionStaff, function(req,res){
     let uniqueCode = req.staff.uniqueCode;
     let name= req.query.name;
@@ -189,9 +184,9 @@ router.get('/byname/', validateSessionStaff, function(req,res){
                 [Op.iLike]: `%${name}%`
               }}
             ]},
-            order: [ [ 'timeArrived', 'ASC' ] ]
+            order: [ [ 'timeArrived', 'DESC' ] ]
     })
-        .then((allParties) => {res.status(200).json(allParties); console.log(req.query.endDate)})
+        .then((allParties) => res.status(200).json(allParties))
         .catch((err) => res.status(500).json({error:err}))
 })
 

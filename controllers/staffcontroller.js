@@ -3,7 +3,7 @@ const Staff = require('../db').import('../models/staff');
 const jwt = require("jsonwebtoken");
 const bcrypt = require('bcryptjs');
 const { Op } = require("sequelize");
-const validateSessionRest = require('../middleware/validateSessionRest');
+// const validateSessionRest = require('../middleware/validateSessionRest');
 const validateSessionStaff = require('../middleware/validateSessionStaff');
 
 router.get('/practice', function(req, res){
@@ -15,16 +15,14 @@ router.post('/create/:uniqueCode', function (req, res) {
     Staff.create({
         uniqueCode : req.params.uniqueCode,
         restaurantId: req.body.staff.restaurantId,
-        //TODO: do i need restaurantID if I have uniqueCode? Probably need to look up restaurantId by uniqueCode
         email: req.body.staff.email,
         password: bcrypt.hashSync(req.body.staff.password, 10),
         active: req.body.staff.active,
         admin: req.body.staff.admin
-        //want both active and admin set to false always as a starting point
     })
     .then(
         function successfulCreation(staff) {
-            let token = jwt.sign({id: staff.id, uniqueCode: staff.uniqueCode, restaurantId: staff.restaurantId, admin: staff.admin}, process.env.JWT_SECRET, {expiresIn: 60*60*24})
+            let token = jwt.sign({id: staff.id, uniqueCode: staff.uniqueCode, restaurantId: staff.restaurantId, admin: staff.admin, active: staff.active}, process.env.JWT_SECRET, {expiresIn: 60*60*24})
             
             res.status(200).json({
                 staff: staff,
@@ -45,6 +43,7 @@ router.post('/create/:uniqueCode', function (req, res) {
 //     }
 // }
 
+
 //STAFF LOGIN
 router.post('/login', function (req, res) {
     Staff.findOne({where:{email:req.body.staff.email}})
@@ -53,7 +52,7 @@ router.post('/login', function (req, res) {
             if(staff){
                 bcrypt.compare(req.body.staff.password, staff.password, function(err, matches){
                     if(matches){
-                        let token = jwt.sign({id: staff.id, uniqueCode: staff.uniqueCode, restaurantId: staff.restaurantId, admin: staff.admin}, process.env.JWT_SECRET, {expiresIn: 60*60*24})
+                        let token = jwt.sign({id: staff.id, uniqueCode: staff.uniqueCode, restaurantId: staff.restaurantId, admin: staff.admin, active: staff}, process.env.JWT_SECRET, {expiresIn: 60*60*24})
                         
                         res.status(200).json({
                             staff: staff,
@@ -79,27 +78,34 @@ router.post('/login', function (req, res) {
 // }
 //No restaurant name or anything else needed
 
+
 //GET ALL STAFF (for given restaurant- Admin restaurant account only)
 router.get('/', validateSessionStaff, function(req,res){
+    //exits if staff does not have admin permission
+    if(req.staff.admin !== true){
+        return;
+    }
     let restaurantCode = req.staff.uniqueCode
-    // let restaurantId = req.body.staff.restaurantId;
     Staff.findAll({
         where: {uniqueCode: restaurantCode}
-        // , include: 'parties' DOESN"T WORK AHHH!!!
+        , include: 'parties'
     } 
 )
         .then((allStaff) => res.status(200).json(allStaff))
         .catch((err) => res.status(500).json({error:err}))
 })
+//NO BODY FOR THIS REQUEST, ALL INFO COMES TOKEN
+
 
 //UPDATE STAFF MEMBER INFO
 router.put('/update/:staffId', validateSessionStaff, function (req, res){
+    //exits if staff does not have admin permission
     if(req.staff.admin !== true){
         return;
     }
 
     const updateStaff = {
-        // email: req.body.staff.email, <-might not need this, thinking of a use case
+        // email: req.body.staff.email, <-might not want to update this, thinking of a use case
         password: bcrypt.hashSync(req.body.staff.password, 10),
         active: req.body.staff.active,
         admin: req.body.staff.admin 
@@ -118,18 +124,22 @@ router.put('/update/:staffId', validateSessionStaff, function (req, res){
     .then((messages) => res.status(200).json(messages))
     .catch((err) => res.status(500).json({error:err}))
 });
-//TODO: Do I want to move staffId out of params into request? 
 // example request:
 // {
 //     "staff" : {
 //         "password": "leavemealonenow",
-//         "active": true
+//         "active": true,
+//         "admin" true
 //     }
 // }
 
+
 //DELETE A STAFF MEMBER
 router.delete('/delete/:staffId', validateSessionStaff, function(req, res) {
-    // const query = {where: {id: req.params.staffId, restaurantId: req.body.staff.restaurantId}};
+    //exits if staff does not have admin permission
+    if(req.staff.admin !== true){
+        return;
+    }
     const query = { 
         where: {
             [Op.and]: [
@@ -143,11 +153,6 @@ router.delete('/delete/:staffId', validateSessionStaff, function(req, res) {
     .then(() => res.status(200).json({message: "This staff member has been removed"}))
     .catch((err) => res.status(500).json({error:err}));
 });
-// example request:
-// {
-//     "staff" : {
-//         "restaurantId": "3"
-//     }
-// }
+//NO BODY FOR THIS REQUEST, ALL INFO TAKEN FROM TOKEN AND URL PARAMS
 
 module.exports = router;
