@@ -3,6 +3,7 @@ const Restaurant = require('../db').import('../models/restaurant');
 const jwt = require("jsonwebtoken");
 const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
+const validateSessionStaff = require('../middleware/validateSessionStaff');
 //Maybe don't need validateSession at all in this file.
 // let validateSessionRest = require('../middleware/validateSessionRest');
 
@@ -76,7 +77,18 @@ router.post('/login', function (req, res) {
 //     }
 // }
 
-//SIMPLE ROUTE TO JUST GET RESTAURANT NAME FROM UUID
+//ROUTE TO GET RESTAURANT WITH STAFF, LOGGED IN
+router.get('/securelookup/', validateSessionStaff,function (req, res) {
+    if(req.staff.admin !== true){
+        return;
+    }
+    Restaurant.findOne({where:{uniqueCode: req.staff.uniqueCode}, include: 'staffs'})
+    .then((restaurant) => res.status(200).json(restaurant))
+    .catch((err) => console.log(err))
+})
+
+
+//SIMPLE ROUTE TO JUST GET RESTAURANT NAME FROM UUID FOR LOGGED OUT STAFF CREATE
 router.get('/lookup/:uuid', function (req, res) {
     Restaurant.findOne({where:{uniqueCode: req.params.uuid}})
     .then((restaurant) => res.status(200).json(restaurant))
