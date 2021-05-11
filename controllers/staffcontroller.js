@@ -52,7 +52,7 @@ router.post('/login', function (req, res) {
             if(staff){
                 bcrypt.compare(req.body.staff.password, staff.password, function(err, matches){
                     if(matches){
-                        let token = jwt.sign({id: staff.id, uniqueCode: staff.uniqueCode, restaurantId: staff.restaurantId, admin: staff.admin, active: staff}, process.env.JWT_SECRET, {expiresIn: 60*60*24})
+                        let token = jwt.sign({id: staff.id, uniqueCode: staff.uniqueCode, restaurantId: staff.restaurantId, admin: staff.admin, active: staff.active}, process.env.JWT_SECRET, {expiresIn: 60*60*24})
                         
                         res.status(200).json({
                             staff: staff,
@@ -64,7 +64,7 @@ router.post('/login', function (req, res) {
                     }            
             });
             } else {
-                res.status(500).send("No staff member found")
+                res.status(500).send({error: "No staff member found"})
             }
         })
     .catch(err => res.status(500).json({error: err}))

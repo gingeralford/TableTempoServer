@@ -100,12 +100,13 @@ router.get('/today', validateSessionStaff, function(req,res){
     // let staffId = req.staff.id < will need this back in when Validate Session
     let time = new Date();
     console.log(time);
-    if (time.getHours() >= 5) {
-        time.setHours(5,0,1)
+    //was set to 5
+    if (time.getHours() >= 9) {
+        time.setHours(9,0,1)
         console.log(time)
         //right now uses UTC which is 4 hours ahead
     } else {
-        time.setHours(5,0,1);
+        time.setHours(9,0,1);
         time.setDate(time.getDate() - 1);
         console.log(time)
     };
@@ -166,7 +167,7 @@ router.get('/daterange/', validateSessionStaff, function(req,res){
             {timeArrived: { [Op.lte]: endDate}},
             {timeArrived: { [Op.gte]: startDate}}
             ]},
-            order: [ [ 'timeArrived', 'ASC' ] ]
+            order: [ [ 'timeArrived', 'DESC' ] ]
     })
         .then((allParties) => res.status(200).json(allParties))
         .catch((err) => res.status(500).json({error:err}))
