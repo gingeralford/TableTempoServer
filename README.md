@@ -2,7 +2,7 @@
 MVC Server (Postgres, Express, Sequelize, Node) for Table Tempo Full-Stack Project. 
 
 <h1>Server for Table Tempo, a Restaurant Waitlist App</h1>
-<p>Table Tempo is a compact web app for managing waitlists in real time, targeted towards small to medium sized restaurants who are implementing "first come, first served" seating arrangments.
+<p>Table Tempo is a compact web app for managing waitlists in real time, targeted towards small to medium sized restaurants who are implementing "first come, first served" seating arrangements.
 The app's primary user would be restaurants and their staff, as it allows them to add parties to a running timed waitlist. The waitlist is ordered by estimated seating time given to the table,
 with seated tables moved to the bottom of the list out of sight. It allows hosts to store information about incoming parties in a compact format, and use visual cues to rapidly determine
 if a party has been waiting longer than expected.
@@ -10,7 +10,7 @@ if a party has been waiting longer than expected.
 <p>The app allows Admin accounts to manage other staff accounts and set permissions for those staff. The reports page allows restaurants to view previous parties by a range of dates, or search for a specific
 party by name to view their visit information. An Admin can see if a party left before being seated, as well compare the estimated wait given to a table to the actual wait until they were seated.</p>
 <h1>Implementation</h1>
-<p>The app is developed with the Model-View-Controller design pattern. The languages/libraries used include PostgreSQL for the actual database and Nodejs as the language in tandem with Sequelize and Express.</p>
+<p>The server is developed with the Model-View-Controller design pattern. The languages/libraries used include PostgreSQL for the actual database and Nodejs as the language in tandem with Sequelize and Express.</p>
 <p>The database has three tables: Restaurants, Staff, and Parties.
 <p>The primary "parent" account a user will register is with the Restaurant Model. Registering a restaurant account will automatically create a staff account with the same email and password, which is
 set as the Admin account at creation. Further staff can be created through a custom link with the Admin area. A uuid code is appended to the link that is specific to only that restaurant account, and ensures
