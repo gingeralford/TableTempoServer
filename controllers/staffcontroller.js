@@ -64,7 +64,7 @@ router.post('/login', function (req, res) {
                     }            
             });
             } else {
-                res.status(500).send("No staff member found")
+                res.status(500).send({error: "No staff member found"})
             }
         })
     .catch(err => res.status(500).json({error: err}))
