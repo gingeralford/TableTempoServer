@@ -1,21 +1,21 @@
 // require("dotenv").config();
 const Sequelize = require('sequelize');
-//this one to run online
-// const sequelize = new Sequelize(process.env.DATABASE_URL, {
-//     dialect: 'postgres',
-//     dialectOptions: {
-//         ssl: {
-//             require:true,
-//             rejectUnauthorized:false,
-//         }
-//     }
-// });
+// this one to run online
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
+    dialect: 'postgres',
+    dialectOptions: {
+        ssl: {
+            require:true,
+            rejectUnauthorized:false,
+        }
+    }
+});
 
 //This one to run local
-const sequelize = new Sequelize('table-tempo-server', 'postgres', 'password', {
-    host: 'localhost',
-    dialect: 'postgres'
-});
+// const sequelize = new Sequelize('table-tempo-server', 'postgres', 'password', {
+//     host: 'localhost',
+//     dialect: 'postgres'
+// });
 
 sequelize.authenticate().then(
     function() {
